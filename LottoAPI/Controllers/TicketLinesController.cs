@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LottoAPI.Models;
+using LottoAPI.Services;
+using AutoMapper;
 
 namespace LottoAPI.Controllers
 {
@@ -14,11 +16,15 @@ namespace LottoAPI.Controllers
     public class TicketLinesController : ControllerBase
     {
         private readonly LottoAPIContext _context;
+        private readonly ITicketRepository _ticketRepository;
 
-        public TicketLinesController(LottoAPIContext context)
+        public TicketLinesController(LottoAPIContext context, ITicketRepository ticketRepository)
         {
             _context = context;
+            _ticketRepository = ticketRepository;
         }
+
+        
 
         // GET: api/TicketLines
         [HttpGet]

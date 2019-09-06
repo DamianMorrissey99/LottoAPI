@@ -9,14 +9,16 @@ namespace LottoAPI.Services
     public interface ITicketRepository 
     {
 
-        Ticket CreateTickets(int numberOfLines);
+        Task CreateTicketsAsync(int numberOfLines);
 
-        IEnumerable<Ticket> GetTickets();
+        Task<IEnumerable<Ticket>> GetTicketsAsync();
 
-        Ticket GetTicket(int ticketId);
+        Task<Ticket> GetTicketAsync(int ticketId);
 
-        Ticket UpdateTicket(List<Ticket> tickets);
+        Ticket UpdateTicket(TicketForUpdateDto tickets, int id);
 
-        int GetTicketStatus(int ticketId);
+        Task<IEnumerable<TicketLines>> GetTicketLineStatus(int ticketId);
+
+        bool TicketExists(int ticketId);
     }
 }

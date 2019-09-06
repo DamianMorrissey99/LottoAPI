@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LottoAPI.Models;
 using LottoAPI.Services;
+using AutoMapper;
 
 namespace LottoAPI.Controllers
 {
@@ -25,41 +26,67 @@ namespace LottoAPI.Controllers
         [HttpPost]
         public IActionResult CreateTicket(int numberOfLines)
         {
-            var tickets =_ticketRepository.CreateTickets(numberOfLines);
-            return new JsonResult(tickets);
+            //var tickets =_ticketRepository.CreateTickets(numberOfLines);
+            _ticketRepository.CreateTicketsAsync(numberOfLines);
+            //return new JsonResult(tickets);
+           // return CreatedAtAction("Ticket Created",null);
+            //return CreatedResult;
+            return Ok();
+            //await _context.SaveChangesAsync();
+
+            //return CreatedAtAction("GetTicket", new { id = ticket.TicketId }, ticket);
+         
         }
 
         // GET: api/Tickets
-        [HttpGet]
+        [HttpGet]        
         public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets()
         {
-            return await _context.Tickets.ToListAsync();
+            var ticketsFromRepo = await _ticketRepository.GetTicketsAsync();
+            var tickets = Mapper.Map<IEnumerable<TicketDto>>(ticketsFromRepo);  
+
+            return  Ok(tickets);
         }
 
         // GET: api/Tickets/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Ticket>> GetTicket(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticketFromRepo = await _ticketRepository.GetTicketAsync(id);
 
-            if (ticket == null)
+            if (ticketFromRepo == null)
             {
                 return NotFound();
             }
 
-            return ticket;
+            var ticket = Mapper.Map<TicketDto>(ticketFromRepo);
+
+            return Ok(ticket);
         }
 
         // PUT: api/Tickets/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTicket(int id, Ticket ticket)
+        public async Task<IActionResult> UpdateTicket(int id,
+                [FromBody] TicketForUpdateDto ticketForUpdate)
         {
-            if (id != ticket.TicketId)
+            if (ticketForUpdate == null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(ticket).State = EntityState.Modified;
+            if (!_ticketRepository.TicketExists(id))
+            {
+                return NotFound();
+            }
+
+            _ticketRepository.UpdateTicket(ticketForUpdate, id);
+
+            //if (id != ticket.TicketId)
+            //{
+            //    return BadRequest();
+            //}
+
+            //_context.Entry(ticket).State = EntityState.Modified;
 
             try
             {
@@ -80,31 +107,47 @@ namespace LottoAPI.Controllers
             return NoContent();
         }
 
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> GetStatusOfTicket(int id)
+        //{
+        //    var ticketFromRepo = await _ticketRepository.GetTicketLineStatus(id);
+
+        //    if (ticketFromRepo == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var ticket = Mapper.Map<TicketLinesDto>(ticketFromRepo);
+
+        //    //return new JsonResult(ticket);
+        //    return Ok(ticket);
+        //}
+
         // POST: api/Tickets
-        [HttpPost]
-        public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
-        {
-            _context.Tickets.Add(ticket);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
+        //{
+        //    _context.Tickets.Add(ticket);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTicket", new { id = ticket.TicketId }, ticket);
-        }
+        //    return CreatedAtAction("GetTicket", new { id = ticket.TicketId }, ticket);
+        //}
 
-        // DELETE: api/Tickets/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Ticket>> DeleteTicket(int id)
-        {
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Tickets/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<Ticket>> DeleteTicket(int id)
+        //{
+        //    var ticket = await _context.Tickets.FindAsync(id);
+        //    if (ticket == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
+        //    _context.Tickets.Remove(ticket);
+        //    await _context.SaveChangesAsync();
 
-            return ticket;
-        }
+        //    return ticket;
+        //}
 
         private bool TicketExists(int id)
         {
