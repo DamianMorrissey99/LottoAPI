@@ -8,17 +8,18 @@ namespace LottoAPI.Services
 {
     public interface ITicketRepository 
     {
-
-        Task CreateTicketsAsync(int numberOfLines);
+        void CreateTickets(int numberOfLines);
 
         Task<IEnumerable<Ticket>> GetTicketsAsync();
 
         Task<Ticket> GetTicketAsync(int ticketId);
 
-        Ticket UpdateTicket(TicketForUpdateDto tickets, int id);
+        Ticket AmendTicket(int id, int numberOfNewLines);
 
         Task<IEnumerable<TicketLines>> GetTicketLineStatus(int ticketId);
 
         bool TicketExists(int ticketId);
+
+        bool HasStatusBeenChecked(int id);
     }
 }

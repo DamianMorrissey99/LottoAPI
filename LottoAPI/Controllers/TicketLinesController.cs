@@ -1,13 +1,7 @@
-﻿ using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LottoAPI.Models;
+﻿using LottoAPI.Models;
 using LottoAPI.Services;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace LottoAPI.Controllers
 {
@@ -24,84 +18,84 @@ namespace LottoAPI.Controllers
             _ticketRepository = ticketRepository;
         }
 
-        
 
-        // GET: api/TicketLines
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TicketLines>>> GetTicketLines()
-        {
-            return await _context.TicketLines.ToListAsync();
-        }
 
-        // GET: api/TicketLines/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TicketLines>> GetTicketLines(int id)
-        {
-            var ticketLines = await _context.TicketLines.FindAsync(id);
+        //// GET: api/TicketLines
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TicketLines>>> GetTicketLines()
+        //{
+        //    return await _context.TicketLines.ToListAsync();
+        //}
 
-            if (ticketLines == null)
-            {
-                return NotFound();
-            }
+        //// GET: api/TicketLines/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<TicketLines>> GetTicketLines(int id)
+        //{
+        //    var ticketLines = await _context.TicketLines.FindAsync(id);
 
-            return ticketLines;
-        }
+        //    if (ticketLines == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-        // PUT: api/TicketLines/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTicketLines(int id, TicketLines ticketLines)
-        {
-            if (id != ticketLines.TicketLinesId)
-            {
-                return BadRequest();
-            }
+        //    return ticketLines;
+        //}
 
-            _context.Entry(ticketLines).State = EntityState.Modified;
+        //// PUT: api/TicketLines/5
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTicketLines(int id, TicketLines ticketLines)
+        //{
+        //    if (id != ticketLines.TicketLinesId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TicketLinesExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    _context.Entry(ticketLines).State = EntityState.Modified;
 
-            return NoContent();
-        }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TicketLinesExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-        // POST: api/TicketLines
-        [HttpPost]
-        public async Task<ActionResult<TicketLines>> PostTicketLines(TicketLines ticketLines)
-        {
-            _context.TicketLines.Add(ticketLines);
-            await _context.SaveChangesAsync();
+        //    return NoContent();
+        //}
 
-            return CreatedAtAction("GetTicketLines", new { id = ticketLines.TicketLinesId }, ticketLines);
-        }
+        //// POST: api/TicketLines
+        //[HttpPost]
+        //public async Task<ActionResult<TicketLines>> PostTicketLines(TicketLines ticketLines)
+        //{
+        //    _context.TicketLines.Add(ticketLines);
+        //    await _context.SaveChangesAsync();
 
-        // DELETE: api/TicketLines/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<TicketLines>> DeleteTicketLines(int id)
-        {
-            var ticketLines = await _context.TicketLines.FindAsync(id);
-            if (ticketLines == null)
-            {
-                return NotFound();
-            }
+        //    return CreatedAtAction("GetTicketLines", new { id = ticketLines.TicketLinesId }, ticketLines);
+        //}
 
-            _context.TicketLines.Remove(ticketLines);
-            await _context.SaveChangesAsync();
+        //// DELETE: api/TicketLines/5
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult<TicketLines>> DeleteTicketLines(int id)
+        //{
+        //    var ticketLines = await _context.TicketLines.FindAsync(id);
+        //    if (ticketLines == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return ticketLines;
-        }
+        //    _context.TicketLines.Remove(ticketLines);
+        //    await _context.SaveChangesAsync();
+
+        //    return ticketLines;
+        //}
 
         private bool TicketLinesExists(int id)
         {

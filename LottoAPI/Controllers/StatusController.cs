@@ -37,5 +37,12 @@ namespace LottoAPI.Controllers
 
             return Ok(ticket);
         }
+
+        private void UpdateAmendStatussOfTicket(int ticketId)
+        {
+            var ticket = _context.Tickets.Where(x => x.TicketId == ticketId).FirstOrDefault();
+            ticket.Amended = true;
+
+        }
     }
 }

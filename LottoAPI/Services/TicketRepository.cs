@@ -17,32 +17,23 @@ namespace LottoAPI.Services
             _appContext = appContext;
         }
 
-        public async Task CreateTicketsAsync(int numberOfLines)
+        public void CreateTickets(int numberOfLines)
         {
-            try
-            {           
+             
                 Ticket newTicket = new Ticket();
                 List<TicketLines> newLines = new List<TicketLines>();
 
                 for (int i = 0; i < numberOfLines; i++)
                 {                
                     var newLine = CreateNewTicketLine();
-                    newLines.Add(newLine);
-                    //newTicket.TicketLines.Add(newLine);            
+                    newLines.Add(newLine);       
                 }
 
                 newTicket.TicketLines = newLines;
 
                 var tickets =  _appContext.Tickets.Add(newTicket);
-                //await _appContext.SaveChangesAsync().ConfigureAwait(false);
                 _appContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            //  return (Ticket)tickets;
-            // return tickets;
+  
         }
     
 
@@ -92,15 +83,42 @@ namespace LottoAPI.Services
             var result = await _appContext.TicketLines.Where(y => y.TicketId == ticketId)
                                     .OrderBy(o => o.Result)
                                     .ToListAsync()
-                                    .ConfigureAwait(true); 
+                                    .ConfigureAwait(false);
 
-            return result;
-            
+            // set the 'amended' status to true (should be 'status checked' not 'amended')         
+            UpdateAmendStatusOfTicket(ticketId);
+
+            return result;            
         }
 
-        public Ticket UpdateTicket(TicketForUpdateDto ticket, int id)
+        private void UpdateAmendStatusOfTicket(int ticketId)
         {
-            return null;
+            var ticket = _appContext.Tickets.Where(x => x.TicketId == ticketId).FirstOrDefault();
+            ticket.Amended = true;
+
+            _appContext.Tickets.Update(ticket);
+            _appContext.SaveChanges();
+        }
+
+        public Ticket AmendTicket(int id, int numberOfNewLines)
+        {
+            var existingTicket = _appContext.Tickets.Include(y => y.TicketLines).Where(x => x.TicketId == id).FirstOrDefault();
+
+            List<TicketLines> newLines = new List<TicketLines>();
+
+            for (int i = 0; i < numberOfNewLines; i++)
+            {
+                var newLine = CreateNewTicketLine();
+                newLines.Add(newLine);                        
+            }
+
+            existingTicket.TicketLines.AddRange(newLines);
+
+            _appContext.Tickets.Update(existingTicket);
+            _appContext.SaveChanges();
+
+            return existingTicket;
+
         }
 
         public bool TicketExists(int ticketId)
@@ -109,15 +127,13 @@ namespace LottoAPI.Services
 
             return ticket == null ? false : true;
 
+        }
 
-            //if (ticket == null)
-            //{
-            //    return false;
-            //}
-            //else
-            //{
-            //    return true;
-            //}
+        public bool HasStatusBeenChecked(int ticketId)
+        {
+            var ticket = _appContext.Tickets.Where(x => x.TicketId == ticketId).FirstOrDefault();
+     
+            return ticket.Amended == false ? false : true;            
         }
     }
 }

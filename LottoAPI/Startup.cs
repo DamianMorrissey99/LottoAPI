@@ -16,6 +16,10 @@ using LottoAPI.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using LottoAPI.Options;
+using DocumentFormat.OpenXml.Bibliography;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace LottoAPI
 {
@@ -36,9 +40,14 @@ namespace LottoAPI
                 setupAction.ReturnHttpNotAcceptable = true;
                 setupAction.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
                 setupAction.OutputFormatters.Add(new StringOutputFormatter());
-                setupAction.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
             }
                 ).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new  OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+        
 
             services.AddDbContext<LottoAPIContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("LottoAPIContext")));
@@ -67,6 +76,13 @@ namespace LottoAPI
                     });
                 }); 
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             AutoMapper.Mapper.Initialize(cfg => 
             {
